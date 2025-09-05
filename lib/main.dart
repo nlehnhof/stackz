@@ -21,7 +21,7 @@ class MainApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Stackz',
         theme: AppTheme.themeData,
-        home: HomePage(projects: []),
+        home: HomePage(),
       ),
     );
   }

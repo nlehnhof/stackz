@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:stackz/providers/project_provider.dart';
 
 import 'package:stackz/widgets/custom_app_bar.dart';
 import 'package:stackz/widgets/button.dart';
@@ -10,8 +11,7 @@ import 'package:stackz/pages/add_project_page.dart';
 import 'package:stackz/pages/project_details_page.dart';
 
 class HomePage extends StatefulWidget {
-  final List<Room> projects;
-  const HomePage({super.key, required this.projects});
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -20,6 +20,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
+    final projects = context.watch<ProjectProvider>().rooms;
+
     return Scaffold(
       appBar: CustomAppBar(
         title: Text(
@@ -43,29 +45,30 @@ class _HomePageState extends State<HomePage> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
-              ListView(
+              ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                children: [
-                  for (var project in widget.projects)
-                    ListTile(
-                      title: Text(
-                        project.name,
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      onTap: () {
-                        // Navigate to the project details page
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => ChangeNotifierProvider(
+                itemCount: projects.length,
+                itemBuilder: (context, index) {
+                  final project = projects[index];
+                  return ListTile(
+                    title: Text(
+                      project.name,
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChangeNotifierProvider(
                             create: (_) => ShelfProvider(project),
                             child: ProjectDetailsPage(room: project),
                           ),
-                          ),
-                        );
-                      },
-                    ),
-                ],
+                        ),
+                      );
+                    },
+                  );
+                }
               ),
               const Divider(),
               CustomButton(

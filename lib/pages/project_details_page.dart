@@ -63,7 +63,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                   ),
                   const SizedBox(height: 20),
                   DropdownButtonFormField<String>(
-                    value: selectedShelfId,
+                    initialValue: selectedShelfId,
                     decoration: const InputDecoration(labelText: "Select Shelf"),
                     items: project.shelves
                         .map((shelf) => DropdownMenuItem(
@@ -81,7 +81,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                   const SizedBox(height: 10),
                   if (selectedShelfId != null)
                     DropdownButtonFormField<String>(
-                      value: selectedLevelId,
+                      initialValue: selectedLevelId,
                       decoration: const InputDecoration(labelText: "Select Level"),
                       items: project.shelves
                           .firstWhere((s) => s.id == selectedShelfId!)

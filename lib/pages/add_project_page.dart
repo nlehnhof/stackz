@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:stackz/providers/project_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:stackz/widgets/custom_app_bar.dart';
@@ -26,7 +28,8 @@ class _AddProjectPageState extends State<AddProjectPage> {
         name: projectName,
         shelves: [],
       );
-      Navigator.pop(context, newProject); // return new project to previous page
+      context.read<ProjectProvider>().addRoom(newProject);
+      Navigator.pop(context); // return new project to previous page
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
