@@ -27,7 +27,6 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
   bool addingShelf = false;
   bool addingLevelMode = false;
 
-  // Item and search controllers
   final _itemNameController = TextEditingController();
   final _itemDescriptionController = TextEditingController();
   final _searchItemController = TextEditingController();
@@ -63,7 +62,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                   ),
                   const SizedBox(height: 20),
                   DropdownButtonFormField<String>(
-                    initialValue: selectedShelfId,
+                    value: selectedShelfId,
                     decoration: const InputDecoration(labelText: "Select Shelf"),
                     items: project.shelves
                         .map((shelf) => DropdownMenuItem(
@@ -81,14 +80,14 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                   const SizedBox(height: 10),
                   if (selectedShelfId != null)
                     DropdownButtonFormField<String>(
-                      initialValue: selectedLevelId,
+                      value: selectedLevelId,
                       decoration: const InputDecoration(labelText: "Select Level"),
                       items: project.shelves
                           .firstWhere((s) => s.id == selectedShelfId!)
                           .levels
                           .map((level) => DropdownMenuItem(
                                 value: level.id,
-                                child: Text("Level ${level.height}"),
+                                child: Text("Level ${level.index}"),
                               ))
                           .toList(),
                       onChanged: (value) => setState(() => selectedLevelId = value),
@@ -142,7 +141,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
         for (var item in level.items) {
           if (item.name.toLowerCase() == query) {
             result =
-                "Item '$query' found in Shelf: ${shelf.name}, Level: ${level.height}";
+                "Item '$query' found in Shelf: ${shelf.name}, Level: ${level.index}";
             break;
           }
         }
@@ -162,8 +161,12 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
     }
 
     void handleAddLevel(Shelf shelf) {
+      final newLevelIndex = shelf.levels.length + 1; // next index
       projectProvider.addLevelToShelf(
-          widget.room.id, shelf.id, Levels(id: uuid.v4(), height: 1));
+        widget.room.id,
+        shelf.id,
+        Levels(id: uuid.v4(), index: newLevelIndex),
+      );
       setState(() {
         selectedShelf = shelf;
       });
@@ -183,48 +186,86 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
         children: [
           // Toolbar
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Wrap(
-              spacing: 10,
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
               children: [
-                CustomButton(
-                  label: addingShelf ? "Cancel Shelf" : "Draw Shelf",
-                  onPressed: () => setState(() {
-                    addingShelf = !addingShelf;
-                    addingLevelMode = false;
-                  }),
-                ),
-                CustomButton(
-                  label: addingLevelMode ? "Stop Adding Levels" : "Add Level",
-                  onPressed: () => setState(() {
-                    addingLevelMode = !addingLevelMode;
-                    addingShelf = false;
-                  }),
-                ),
-                CustomButton(label: 'Add Item', onPressed: _addItem),
-                SizedBox(
-                  width: 200,
+                Container(
+                  padding: const EdgeInsets.all(8.0),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 8,
+                        offset: Offset(5, 5),
+                      ),
+                    ],
+                  ),
                   child: TextField(
                     controller: _searchItemController,
                     decoration: const InputDecoration(
                       labelText: "Search Item",
-                      border: OutlineInputBorder(),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     ),
                   ),
                 ),
-                CustomButton(label: 'Find Item', onPressed: _findItem),
+                const SizedBox(height: 15),
+                Row(
+                  children: [
+                    Expanded(
+                      child: CustomButton(
+                        label: addingShelf ? "Cancel Shelf" : "Draw Shelf",
+                        onPressed: () => setState(() {
+                          addingShelf = !addingShelf;
+                          addingLevelMode = false;
+                        }),
+                        buttonWidth: double.infinity,
+                      ),
+                    ),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: CustomButton(
+                        label: addingLevelMode ? "Stop Adding Levels" : "Add Level",
+                        onPressed: () => setState(() {
+                          addingLevelMode = !addingLevelMode;
+                          addingShelf = false;
+                        }),
+                        buttonWidth: double.infinity,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 15),
+                Row(
+                  children: [
+                    Expanded(
+                      child: CustomButton(
+                          label: 'Add Item',
+                          onPressed: _addItem,
+                          buttonWidth: double.infinity),
+                    ),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: CustomButton(
+                          label: 'Find Item',
+                          onPressed: _findItem,
+                          buttonWidth: double.infinity),
+                    ),
+                  ],
+                )
               ],
             ),
           ),
 
-          // Search result
           if (_searchResult.isNotEmpty)
             Padding(
               padding: const EdgeInsets.all(4.0),
               child: Text(_searchResult, style: Theme.of(context).textTheme.bodyLarge),
             ),
-
-          // Editable room view
+          const Divider(),
           Expanded(
             child: EditableRoomView(
               room: widget.room,

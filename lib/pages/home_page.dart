@@ -6,9 +6,9 @@ import 'package:stackz/widgets/custom_app_bar.dart';
 import 'package:stackz/widgets/button.dart';
 
 import 'package:stackz/providers/shelf_provider.dart';
-import 'package:stackz/models/room.dart';
 import 'package:stackz/pages/add_project_page.dart';
 import 'package:stackz/pages/project_details_page.dart';
+import 'package:stackz/app_theme.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -23,6 +23,7 @@ class _HomePageState extends State<HomePage> {
     final projects = context.watch<ProjectProvider>().rooms;
 
     return Scaffold(
+      backgroundColor: Theme.of(context).primaryColor,
       appBar: CustomAppBar(
         title: Text(
           'Home Page',
@@ -30,8 +31,10 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: SingleChildScrollView(
-        child: Center(
-          child: Column(
+          child: Center(
+          child: Padding(
+            padding: EdgeInsets.all(12.0),
+            child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
@@ -44,7 +47,6 @@ class _HomePageState extends State<HomePage> {
                 style: Theme.of(context).textTheme.bodyMedium,
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 20),
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -79,9 +81,11 @@ class _HomePageState extends State<HomePage> {
                    ); // Navigate to the new project creation page
                 },
                 label: 'Start New Project',
+                color: AppTheme.buttonColor,
               ),
             ],
           ),
+        ),
         ),
       ),
     );
